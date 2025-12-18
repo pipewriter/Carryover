@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Streaks: Overload</title>
+  <style>
+    :root {
+      --bg: #0b0b10;
+      --panel: rgba(20, 20, 28, 0.72);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.65);
+      --muted2: rgba(255, 255, 255, 0.45);
+      --good: #4ade80;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --accent: #60a5fa;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: var(--bg);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0.3px;
+    }
+    header .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .row > * { flex: 0 0 auto; }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      max-width: 360px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+      background: rgba(0,0,0,0.20);
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      max-width: 360px;
+      color: var(--muted);
+    }
+
+    button {
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.02s ease-in-out, background 0.12s ease-in-out;
+    }
+    button:hover { background: rgba(255,255,255,0.12); }
+    button:active { transform: translateY(1px); }
+    button.primary {
+      border-color: rgba(96, 165, 250, 0.55);
+      background: rgba(96, 165, 250, 0.18);
+    }
+    button.danger {
+      border-color: rgba(251, 113, 133, 0.55);
+      background: rgba(251, 113, 133, 0.15);
+    }
+    button.ghost {
+      background: transparent;
+    }
+
+    .hint {
+      color: var(--muted2);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .tasks {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .task {
+      border: 1px solid var(--panel-border);
+      background: rgba(0,0,0,0.22);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 240px;
+    }
+
+    .taskHead {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.06);
+      object-fit: cover;
+    }
+
+    .taskTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .taskTitle .name {
+      font-size: 16px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .taskTitle .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pill.good { border-color: rgba(74, 222, 128, 0.35); color: rgba(74, 222, 128, 0.95); }
+    .pill.warn { border-color: rgba(251, 191, 36, 0.35); color: rgba(251, 191, 36, 0.95); }
+    .pill.bad  { border-color: rgba(251, 113, 133, 0.35); color: rgba(251, 113, 133, 0.95); }
+
+    .progressWrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .progressMeta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .progress {
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(96,165,250,0.35), rgba(74,222,128,0.45));
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .quick button {
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .footerRow {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted2);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.72);
+      border: 1px solid var(--panel-border);
+      padding: 10px 12px;
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-in-out;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Streaks: Overload</h1>
+        <div class="sub">Don’t let your streak hit 0 — keep the hopper ≥ <span id="thresholdSpan">1.0</span> (100%).</div>
+      </div>
+      <div class="sub" id="clock">—</div>
+    </header>
+
+    <div class="panel">
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <div style="font-weight: 650; margin-bottom: 6px;">How it works</div>
+          <div class="hint" id="rulesHint">
+            Each task has a hopper (1.0 = 100%). When the hopper reaches 1.0 for the day, the streak increments immediately.
+            At midnight, if you never hit 1.0 that day, the streak resets to 0. At midnight the hopper also decays by 10%.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight: 650; margin-bottom: 10px;">Page background</div>
+      <form id="bgForm" class="row">
+        <input id="bgFile" type="file" accept="image/*" />
+        <button class="primary" type="submit">Upload background</button>
+        <button class="ghost" id="clearBgBtn" type="button">Clear</button>
+        <span class="hint" id="bgStatus"></span>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight: 650; margin-bottom: 10px;">Create a daily task</div>
+      <form id="createForm" class="row">
+        <input id="taskName" type="text" placeholder="e.g., Duolingo, Workout, Read 10 pages…" required />
+        <input id="taskThumb" type="file" accept="image/*" />
+        <button class="primary" type="submit">Create task</button>
+      </form>
+      <div class="hint" style="margin-top: 8px;">
+        Tip: You can add more than 1.0 (100%) to build a buffer. The hopper decays by 10% at midnight (so 2.0 becomes 1.8, etc).
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content: space-between; gap: 10px; align-items: baseline;">
+        <div style="font-weight: 650;">Your tasks</div>
+        <div class="hint" id="todayLine">—</div>
+      </div>
+      <div id="tasks" class="tasks"></div>
+      <div id="emptyState" class="hint" style="margin-top: 12px; display:none;">
+        No tasks yet. Create one above.
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    let STATE = null;
+    let REFRESH_TIMER = null;
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('\"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+    }
+
+    function fmtNum(n, digits=3) {
+      const num = Number(n);
+      if (!Number.isFinite(num)) return '0';
+      const s = num.toFixed(digits);
+      return s.replace(/\\.0+$/, '').replace(/(\\.\\d*[1-9])0+$/, '$1');
+    }
+
+    function pct(hopper, threshold) {
+      if (!threshold) return 0;
+      return (Number(hopper) / Number(threshold)) * 100;
+    }
+
+    function showToast(msg) {
+      const el = $('#toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove('show'), 1800);
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, opts);
+      if (!res.ok) {
+        let msg = '';
+        try {
+          const data = await res.json();
+          msg = data && data.error ? data.error : JSON.stringify(data);
+        } catch {
+          msg = await res.text();
+        }
+        throw new Error(msg || ('HTTP ' + res.status));
+      }
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) return res.json();
+      return res.text();
+    }
+
+    function setBackground(url) {
+      if (url) {
+        // cache-bust so newly uploaded bg appears immediately
+        document.body.style.backgroundImage = `url(${url}?v=${Date.now()})`;
+        $('#bgStatus').textContent = 'Background set.';
+      } else {
+        document.body.style.backgroundImage = '';
+        $('#bgStatus').textContent = 'No background set.';
+      }
+    }
+
+    function render() {
+      if (!STATE) return;
+
+      const threshold = STATE.config?.dailyThreshold ?? 1.0;
+      const decay = STATE.config?.dailyDecayMultiplier ?? 0.9;
+
+      $('#thresholdSpan').textContent = fmtNum(threshold, 2);
+      $('#rulesHint').textContent =
+        `Each task has a hopper (1.0 = 100%). When the hopper reaches ${fmtNum(threshold,2)} for the day, the streak increments immediately. ` +
+        `At midnight, if you never hit ${fmtNum(threshold,2)} that day, the streak resets to 0. ` +
+        `At midnight the hopper decays by ${(100 - decay*100).toFixed(0)}%.`;
+
+      const now = new Date(STATE.now || Date.now());
+      $('#clock').textContent = now.toLocaleString();
+      $('#todayLine').textContent = `Today: ${STATE.today}`;
+
+      setBackground(STATE.backgroundUrl);
+
+      const tasksEl = $('#tasks');
+      tasksEl.innerHTML = '';
+
+      const tasks = Array.isArray(STATE.tasks) ? STATE.tasks.slice() : [];
+      tasks.sort((a, b) => (b.streak || 0) - (a.streak || 0));
+
+      $('#emptyState').style.display = tasks.length ? 'none' : 'block';
+
+      for (const t of tasks) {
+        const hopper = Number(t.hopper || 0);
+        const p = pct(hopper, threshold);
+        const clipped = Math.max(0, Math.min(100, p));
+        const secured = !!t.securedToday;
+
+        let pillClass = 'bad';
+        let pillText = 'Not secured today';
+        if (secured) { pillClass = 'good'; pillText = 'Secured today'; }
+        else if (p >= 50) { pillClass = 'warn'; pillText = 'Halfway'; }
+
+        const thumb = t.thumbnailUrl ? `<img class="thumb" src="${t.thumbnailUrl}?v=${t.updatedAt || ''}" alt="thumbnail" />`
+                                     : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:12px;">No image</div>`;
+
+        const card = document.createElement('div');
+        card.className = 'task';
+        card.innerHTML = `
+          <div class="taskHead">
+            ${thumb}
+            <div class="taskTitle">
+              <div class="name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+              <div class="meta">
+                <span class="pill">🔥 Streak: <b style="color:var(--text)">${Number(t.streak || 0)}</b></span>
+                <span class="pill ${pillClass}">● ${pillText}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progressWrap">
+            <div class="progressMeta">
+              <div>Hopper: <b style="color:var(--text)">${fmtNum(hopper, 4)}</b> (${fmtNum(p, 1)}%)</div>
+              <div style="color:var(--muted2)">Day: ${escapeHtml(t.dayKey || '')}</div>
+            </div>
+            <div class="progress"><div class="bar" style="width:${clipped}%"></div></div>
+            ${p > 100 ? `<div class="small">Buffer: +${fmtNum(p - 100, 1)}% (will decay overnight)</div>` : `<div class="small">&nbsp;</div>`}
+          </div>
+
+          <div class="controls">
+            <div>
+              <label>Amount to add</label>
+              <input class="amountInput" type="number" step="0.1" value="1.0" />
+            </div>
+            <button class="primary addBtn" type="button">Add</button>
+          </div>
+
+          <div class="quick">
+            <button type="button" class="qbtn" data-val="0.1">+0.1</button>
+            <button type="button" class="qbtn" data-val="0.5">+0.5</button>
+            <button type="button" class="qbtn" data-val="1.0">+1.0</button>
+            <button type="button" class="qbtn" data-val="2.0">+2.0</button>
+            <button type="button" class="qbtn" data-val="5.0">+5.0</button>
+          </div>
+
+          <div class="footerRow">
+            <div class="small">${t.lastSecuredAt ? `Last secured: ${new Date(t.lastSecuredAt).toLocaleString()} (${t.lastSecuredReason || ''})` : '—'}</div>
+            <button class="danger delBtn" type="button">Delete</button>
+          </div>
+        `;
+
+        const amountInput = card.querySelector('.amountInput');
+        const addBtn = card.querySelector('.addBtn');
+        const delBtn = card.querySelector('.delBtn');
+
+        async function doAdd(amount) {
+          const a = Number(amount);
+          // if (!Number.isFinite(a) || a <= 0) {
+          //   showToast('Enter a positive number');
+          //   return;
+          // }
+          try {
+            const out = await api(`/api/tasks/${encodeURIComponent(t.id)}/add`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount: a }),
+            });
+            STATE.tasks = STATE.tasks.map(x => x.id === t.id ? out.task : x);
+            showToast(out.secured ? 'Added — day secured ✅' : 'Added');
+            await refresh(); // re-fetch for consistent rollover rules
+          } catch (e) {
+            alert(String(e.message || e));
+          }
+        }
+
+        addBtn.addEventListener('click', () => doAdd(amountInput.value));
+
+        for (const q of card.querySelectorAll('.qbtn')) {
+          q.addEventListener('click', () => doAdd(q.getAttribute('data-val')));
+        }
+
+        delBtn.addEventListener('click', async () => {
+          if (!confirm(`Delete \"${t.name}\"?`)) return;
+          try {
+            await api(`/api/tasks/${encodeURIComponent(t.id)}`, { method: 'DELETE' });
+            showToast('Deleted');
+            await refresh();
+          } catch (e) {
+            alert(String(e.message || e));
+          }
+        });
+
+        tasksEl.appendChild(card);
+      }
+    }
+
+    async function refresh() {
+      try {
+        STATE = await api('/api/state');
+        render();
+      } catch (e) {
+        console.error(e);
+        $('#emptyState').style.display = 'block';
+        $('#emptyState').textContent = 'Failed to load state: ' + String(e.message || e);
+      }
+    }
+
+    // Background upload
+    $('#bgForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = $('#bgFile').files[0];
+      if (!file) { showToast('Choose an image first'); return; }
+      const fd = new FormData();
+      fd.append('background', file);
+      try {
+        await api('/api/background', { method: 'POST', body: fd });
+        $('#bgFile').value = '';
+        showToast('Background uploaded');
+        await refresh();
+      } catch (err) {
+        alert(String(err.message || err));
+      }
+    });
+
+    $('#clearBgBtn').addEventListener('click', async () => {
+      try {
+        await api('/api/background/clear', { method: 'POST' });
+        showToast('Background cleared');
+        await refresh();
+      } catch (err) {
+        alert(String(err.message || err));
+      }
+    });
+
+    // Create task
+    $('#createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = $('#taskName').value.trim();
+      if (!name) { showToast('Task name required'); return; }
+
+      const fd = new FormData();
+      fd.append('name', name);
+      const thumb = $('#taskThumb').files[0];
+      if (thumb) fd.append('thumbnail', thumb);
+
+      try {
+        await api('/api/tasks', { method: 'POST', body: fd });
+        $('#taskName').value = '';
+        $('#taskThumb').value = '';
+        showToast('Task created');
+        await refresh();
+      } catch (err) {
+        alert(String(err.message || err));
+      }
+    });
+
+    // Auto refresh
+    refresh();
+    REFRESH_TIMER = setInterval(refresh, 15000);
+  </script>
+</body>
+</html>

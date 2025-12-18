@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "createdAt": 1765554031338,
+  "updatedAt": 1766075110892,
+  "backgroundUrl": "/uploads/background-1765555431112-d3664f10-6109-46ba-bed8-12e1b8ca8622.png",
+  "tasks": [
+    {
+      "id": "252f6668-d523-4885-850d-8c7475d62b52",
+      "name": "duolingo",
+      "thumbnailUrl": "/uploads/thumb-252f6668-d523-4885-850d-8c7475d62b52-1765554045007.png",
+      "hopper": 0,
+      "streak": 2,
+      "dayKey": "2025-12-18",
+      "securedToday": true,
+      "createdAt": 1765554045011,
+      "updatedAt": 1766074527930,
+      "lastSecuredAt": 1766063948051,
+      "lastSecuredReason": "add"
+    },
+    {
+      "id": "6a141a25-6040-4129-b446-aa4ee2ce435b",
+      "name": "snap",
+      "thumbnailUrl": "/uploads/thumb-6a141a25-6040-4129-b446-aa4ee2ce435b-1765554062961.png",
+      "hopper": 0,
+      "streak": 2,
+      "dayKey": "2025-12-18",
+      "securedToday": true,
+      "createdAt": 1765554062962,
+      "updatedAt": 1766074545352,
+      "lastSecuredAt": 1766063945527,
+      "lastSecuredReason": "add"
+    },
+    {
+      "id": "c28a3014-8c42-409a-8076-ceffab874cbd",
+      "name": "apply to 4 job applications",
+      "thumbnailUrl": "/uploads/thumb-c28a3014-8c42-409a-8076-ceffab874cbd-1765555327174.png",
+      "hopper": 3.75,
+      "streak": 2,
+      "dayKey": "2025-12-18",
+      "securedToday": true,
+      "createdAt": 1765555327175,
+      "updatedAt": 1766074488553,
+      "lastSecuredAt": 1766044809473,
+      "lastSecuredReason": "rollover"
+    }
+  ]
+}
